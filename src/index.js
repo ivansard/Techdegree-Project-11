@@ -3,8 +3,27 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
 
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Setting up mongoose
+
+mongoose.connect('mongodb://localhost:27017/course-api');
+const db = mongoose.connection;
+
+db.on('error', error => {
+  console.log('Connection error:', error);
+})
+
+db.once('open', () => {
+  console.log('Db connection successful');
+})
 
 // set our port
 app.set('port', process.env.PORT || 5000);
