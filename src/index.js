@@ -5,6 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const session = require('express-session');
 
 //Importing models
 
@@ -15,8 +16,21 @@ const Review = require('./models').Review
 
 const app = express();
 
+//Adding body-parser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//Adding sessions
+app.use(session({
+  secret: 'Ivan project',
+  resave: true,
+  saveUninitialized: false
+}))
+
+//Requiring paths
+const userPaths = require('./routes/users');
+
+app.use('/api/users', userPaths);
 
 // Setting up mongoose
 
@@ -38,6 +52,23 @@ app.set('port', process.env.PORT || 5000);
 app.use(morgan('dev'));
 
 // TODO add additional routes here
+
+app.get('/api/users', (req, res, next) => {
+  //Checking for the presence of email and password
+  if(req.email && req.password){
+    User.authenticate(req.email, req.password, function(error, user){
+      //If an error was returned, or if there is no returned user, return an error
+      res.send('Validated user')
+    })
+  } else {
+    //If either email or password is missing we create a 401 error
+    //which represents 'Unauthorized' - missing or bad authentication
+    let error = new Error('Both email and password must be submitted')
+    error.status = 401
+    return next(error);
+  }
+})
+
 
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {

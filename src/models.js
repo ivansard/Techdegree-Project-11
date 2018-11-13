@@ -19,6 +19,28 @@ const UserSchema = new Schema({
 
 const User = mongoose.model('User', UserSchema);
 
+UserSchema.statics.authenticate = function(email, password, callback){
+    //Find the document with the matching email
+    User.findOne({email: email})
+        .exec(function(error, user){
+            if(error){
+                let err = new Error('A user with the submitted email does not exist');
+                err.status = 401;
+                return callback(error);
+            }
+            //Check if the returned user's email matches the submitted one
+            //ENCRYPTION CHECK-UP NEEDED HERE
+            if(user.password !== password){
+                let err = new Error('Incorrect password');
+                err.status = 401;
+                return callback(error);
+            }
+            //If everything is ok, we return the user in the callback
+            return callback(null, user);
+        })
+}
+
+
 //Review schema and model
 
 function validateRating(rating){
