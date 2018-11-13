@@ -1,0 +1,4 @@
+Implement usage of sessions in project
+    Implement post route for a user to log in
+        Set the user data in the session
+    Implement get route to get the currently authenticated user

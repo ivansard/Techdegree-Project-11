@@ -17,10 +17,10 @@ const Review = require('./models').Review
 const app = express();
 
 //Adding body-parser
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//Adding sessions
+//Adding session
 app.use(session({
   secret: 'Ivan project',
   resave: true,
@@ -68,6 +68,7 @@ app.get('/api/users', (req, res, next) => {
     return next(error);
   }
 })
+
 
 
 // send a friendly greeting for the root route

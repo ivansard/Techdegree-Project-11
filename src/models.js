@@ -13,15 +13,13 @@ const emailValidator = [validateEmail, 'Email must be in correct format!']
 
 const UserSchema = new Schema({
     fullName: String,
-    email: {type: String, unique: true, validate: emailValidator},
+    emailAddress: {type: String, unique: true, validate: emailValidator},
     password: String
 })
 
-const User = mongoose.model('User', UserSchema);
-
 UserSchema.statics.authenticate = function(email, password, callback){
     //Find the document with the matching email
-    User.findOne({email: email})
+    User.findOne({emailAddress: email})
         .exec(function(error, user){
             if(error){
                 let err = new Error('A user with the submitted email does not exist');
@@ -36,9 +34,13 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 return callback(error);
             }
             //If everything is ok, we return the user in the callback
-            return callback(null, user);
+            return callback(null, user); 
         })
 }
+
+const User = mongoose.model('User', UserSchema);
+
+
 
 
 //Review schema and model
