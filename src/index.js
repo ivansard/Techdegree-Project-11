@@ -6,6 +6,12 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+//Importing models
+
+const Course = require('./models').Course
+const User = require('./models').User
+const Review = require('./models').Review
+
 
 const app = express();
 
