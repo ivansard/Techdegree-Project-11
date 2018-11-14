@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
@@ -17,6 +18,21 @@ const UserSchema = new Schema({
     password: {type: String, required: true}
 })
 
+// Pre-save hook, which is used for hashing passwords
+UserSchema.pre('save', function(next){
+    //this will refer to the document which is about to be saved in the database
+    const user = this;
+    //Hashing the user's password
+    bcrypt.hash(user.password, 10, function(error, hashedPassword){
+        if(error){
+            return next(error);
+        }
+        user.password = hashedPassword;
+        next(); 
+    })
+})
+
+//User authentication method
 UserSchema.statics.authenticate = function(email, password, callback){
     //Find the document with the matching email
     User.findOne({emailAddress: email})
@@ -26,15 +42,20 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 err.status = 401;
                 return callback(error);
             }
-            //Check if the returned user's email matches the submitted one
-            //ENCRYPTION CHECK-UP NEEDED HERE
-            if(user.password !== password){
-                let err = new Error('Incorrect password');
-                err.status = 401;
-                return callback(error);
-            }
-            //If everything is ok, we return the user in the callback
-            return callback(null, user); 
+            //Check if the returned user's password matches the submitted one
+            bcrypt.compare(password, user.password, function(error, result){
+                //The compare function returns either an error or the result
+                //Checking for the error
+                if(error){
+                    return callback(error);
+                }
+                //If everything is ok, we return the user in the callback
+                if(result === true){
+                    return callback(null, user); 
+                } else {
+                    return callback()
+                }
+            })
         })
 }
 

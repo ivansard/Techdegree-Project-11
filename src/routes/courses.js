@@ -69,10 +69,9 @@ router.get('/', (req, res, next) => {
     //Selecting only the id and title fields of all courses
     Course.find({}, '_id title', function(error, courses){
         if(error){
-            //If there was an error handle it
-            let err = new Error('Unfortunately, could not retrieve courses');
-            err.status = 404;
-            return next(err);
+            //If there was an error, send it back to the user
+            error.status = 404;
+            return next(error);
         } else {
             //If not return the course results as json
             return res.json(courses);
@@ -91,10 +90,8 @@ router.put('/:courseId', (req, res, next) => {
             console.log(course); 
             if(error || !course){
                 //If there was an error, send it back to the user
-                let err = new Error('Unfortunately, the course could not be found');
-                //Should it be 404?
-                err.status = 404;
-                return next(err);
+                error.status = 404;
+                return next(error);
             } else {
                 //After retrieving the course, set its data to the request body
                 course.set(req.body);
@@ -116,10 +113,8 @@ router.post('/:courseId/reviews', (req, res, next) => {
         .exec(function(error, course){
             if(error || !course){
                 //If there was an error, send it back to the user
-                let err = new Error('Unfortunately, the course could not be found');
-                //Should it be 404?
-                err.status = 404;
-                return next(err);
+                error.status = 404;
+                return next(error);
             } else {
                 //A user must be logged in in order to submit a review
                 // if(!req.session.userId){

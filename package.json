@@ -12,10 +12,13 @@
     "nodemon": "^1.17.5"
   },
   "dependencies": {
+    "basic-auth": "^2.0.1",
+    "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "mongoose": "^5.3.11",
-    "morgan": "^1.9.0"
+    "morgan": "^1.9.0",
+    "request": "^2.88.0"
   }
 }

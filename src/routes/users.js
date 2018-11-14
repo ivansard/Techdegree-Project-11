@@ -36,7 +36,6 @@ router.post('/', (req, res, next) => {
     //Checking for the presence of email, password and full name
     if(req.body.emailAddress && req.body.password && req.body.fullName){
         //If all fields are there, create a user
-        console.log('Here');
         User.create({
             fullName: req.body.fullName,
             emailAddress: req.body.emailAddress,
