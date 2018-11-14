@@ -29,11 +29,12 @@ app.use(session({
 
 //Requiring paths
 const userPaths = require('./routes/users');
+const coursePaths = require('./routes/courses');
 
 app.use('/api/users', userPaths);
+app.use('/api/courses', coursePaths);
 
 // Setting up mongoose
-
 mongoose.connect('mongodb://localhost:27017/course-api');
 const db = mongoose.connection;
 
@@ -45,29 +46,14 @@ db.once('open', () => {
   console.log('Db connection successful');
 })
 
-// set our port
+// Setting up port
 app.set('port', process.env.PORT || 5000);
 
-// morgan gives us http request logging
+// Morgan supplying us with request logging
 app.use(morgan('dev'));
 
 // TODO add additional routes here
 
-app.get('/api/users', (req, res, next) => {
-  //Checking for the presence of email and password
-  if(req.email && req.password){
-    User.authenticate(req.email, req.password, function(error, user){
-      //If an error was returned, or if there is no returned user, return an error
-      res.send('Validated user')
-    })
-  } else {
-    //If either email or password is missing we create a 401 error
-    //which represents 'Unauthorized' - missing or bad authentication
-    let error = new Error('Both email and password must be submitted')
-    error.status = 401
-    return next(error);
-  }
-})
 
 
 

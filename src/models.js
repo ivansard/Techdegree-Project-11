@@ -6,15 +6,15 @@ const Schema = mongoose.Schema;
 
 function validateEmail(email){
    const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-   return emailRegex.test(email.text);
+   return emailRegex.test(email);
 }
 
 const emailValidator = [validateEmail, 'Email must be in correct format!']
 
 const UserSchema = new Schema({
-    fullName: String,
+    fullName: {type: String, required: true},
     emailAddress: {type: String, unique: true, validate: emailValidator},
-    password: String
+    password: {type: String, required: true}
 })
 
 UserSchema.statics.authenticate = function(email, password, callback){
