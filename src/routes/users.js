@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
+//Importing middleware 
+const mid = require('../middleware/index')
+//Importing user model
 const User = require('../models').User;
 
 // GET /api/users
 // Retrieves the currently authenticated user
-
-router.get('/', (req, res, next) => {
-    //Check if there is a user in the current session
-    if(req.session.userId){
-        //If there is, query the database with his id to get the whole user document
+router.get('/', mid.headerAuthentication, (req, res, next) => {
         User.findById(req.session.userId)
             .exec( function(error, user){
+                console.log(user);
                 if(error){
                     //If there was an error, send it back to the user
                     let err = new Error('Unfortunately, the user could not be found');
@@ -23,11 +23,6 @@ router.get('/', (req, res, next) => {
                     return res.json(user);
                 }
             })
-    } else {
-        return res.json({
-            "message": "There is no user currently logged in"
-        })
-    }
 })
 
 // POST /api/users
@@ -59,7 +54,7 @@ router.post('/', (req, res, next) => {
     }
 })
 
-// POST /api/users/long
+// POST /api/users/login
 // Allows users to login
 router.post('/login', (req, res, next) => {
     //Checking for the presence of email and password
@@ -82,6 +77,21 @@ router.post('/login', (req, res, next) => {
         error.status = 401 
         return next(error); 
       }
+})
+
+// POST /api/users/logout
+// Allows users to login
+router.post('/logout', (req, res, next) => {
+    //Checking for the presence of email and password
+    if(req.session){
+        req.session.destroy(function(error){
+            if(error){
+                return next(error);
+            } else {
+                return res.redirect('/')
+            }
+        })
+    }
 })
 
 

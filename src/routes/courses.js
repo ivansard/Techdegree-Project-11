@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
+//Importing models
 const Course = require('../models').Course
-const User = require('../models').User
 const Review = require('../models').Review
+
+//Importing middleware
+
+const mid = require('../middleware/index')
 
 // POST /api/courses
 // Creates a new course
 
-router.post('/', (req, res, next) => {
+router.post('/', mid.headerAuthentication, (req, res, next) => {
     const title = req.body.title;
     const description = req.body.description;
     //Checking if required fields title and description have been submitted
@@ -81,7 +85,7 @@ router.get('/', (req, res, next) => {
 
 // PUT api/courses/:courseId
 // Updates the given course
-router.put('/:courseId', (req, res, next) => {
+router.put('/:courseId', mid.headerAuthentication, (req, res, next) => {
     const courseId = req.params.courseId;
     console.log(courseId);
     //Based on the query parameters courseId, retrieve the specific course
@@ -106,7 +110,7 @@ router.put('/:courseId', (req, res, next) => {
         })
 })
 
-router.post('/:courseId/reviews', (req, res, next) => {
+router.post('/:courseId/reviews', mid.headerAuthentication, (req, res, next) => {
     const courseId = req.params.courseId;
     //Based on the query parameters courseId, retrieve the specific course
     Course.findById(courseId)

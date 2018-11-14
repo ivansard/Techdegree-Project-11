@@ -42,20 +42,27 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 err.status = 401;
                 return callback(error);
             }
+            if(user.password !== password){
+                let err = new Error('Incorrect password');
+                err.status = 401;
+                return callback(error);
+            }
+            //If everything is ok, we return the user in the callback
+            return callback(null, user);
             //Check if the returned user's password matches the submitted one
-            bcrypt.compare(password, user.password, function(error, result){
-                //The compare function returns either an error or the result
-                //Checking for the error
-                if(error){
-                    return callback(error);
-                }
-                //If everything is ok, we return the user in the callback
-                if(result === true){
-                    return callback(null, user); 
-                } else {
-                    return callback()
-                }
-            })
+            // bcrypt.compare(password, user.password, function(error, result){
+            //     //The compare function returns either an error or the result
+            //     //Checking for the error
+            //     if(error){
+            //         return callback(error);
+            //     }
+            //     //If everything is ok, we return the user in the callback
+            //     if(result === true){
+            //         return callback(null, user); 
+            //     } else {
+            //         return callback()
+            //     }
+            // })
         })
 }
 
