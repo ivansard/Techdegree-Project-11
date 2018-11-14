@@ -50,9 +50,18 @@ router.post('/', mid.headerAuthentication, (req, res, next) => {
 // Returns the course id and title for the given course
 router.get('/:courseId', (req, res, next) => {
     const courseId = req.params.courseId;
+    //Using deep population to fetch only the full names of the users
     Course.findById(courseId)
-          .populate('user')
-          .populate('reviews')
+          .populate('user', 'fullName')
+          .populate({
+              path: 'reviews',
+              model: 'Review',
+              populate: {
+                  path: 'user',
+                  model: 'User',
+                  select: 'fullName'
+              }
+          })
           .exec(function(error, course){
               if(error){
                    //If there was an error, send it back to the user
