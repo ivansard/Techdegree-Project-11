@@ -57,7 +57,7 @@ const ratingValidator = [validateRating, 'Rating must be between 1 and 5'];
 const ReviewSchema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'User'},
     postedOn: {type: Date, default: Date.now},
-    rating: {type: Number, validate: ratingValidator},
+    rating: {type: Number, required: true, validate: ratingValidator},
     review: String
 })
 
