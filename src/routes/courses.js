@@ -13,10 +13,8 @@ const mid = require('../middleware/index')
 // Creates a new course
 
 router.post('/', mid.headerAuthentication, (req, res, next) => {
-    const title = req.body.title;
-    const description = req.body.description;
     //Checking if required fields title and description have been submitted
-    if(title && description){
+    if(req.body.title && req.body.description){
         //Checking for estimatedTime and materialsNeeded
         let estimatedTime = req.body.estimatedTime;
         if(estimatedTime === undefined){
@@ -29,8 +27,8 @@ router.post('/', mid.headerAuthentication, (req, res, next) => {
         //Creating the course based on submitted data
         Course.create({
             user: req.session.userId,
-            title: title,
-            description: description,
+            title: req.body.title,
+            description: req.body.description,
             estimatedTime: estimatedTime,
             materialsNeeded: materialsNeeded
         }, function(error, course){
@@ -120,6 +118,12 @@ router.post('/:courseId/reviews', mid.headerAuthentication, (req, res, next) => 
                 error.status = 404;
                 return next(error);
             } else {
+                //Validation that user cannot review his own course
+                if(course.user._id.equals(req.session.userId)){
+                    let err = new Error('User who created this course cannot review it');
+                    err.status = 400;
+                    return next(err);
+                }
                 //A user must be logged in in order to submit a review
                 // if(!req.session.userId){
                 //     let error = new Error('A user must be logged in, in order to submit a review')
