@@ -11,7 +11,6 @@ const mid = require('../middleware/index')
 
 // POST /api/courses
 // Creates a new course
-
 router.post('/', mid.headerAuthentication, (req, res, next) => {
     //Checking if required fields title and description have been submitted
     if(req.body.title && req.body.description){

@@ -94,6 +94,56 @@ router.post('/logout', (req, res, next) => {
     }
 })
 
+// PUT /api/users
+// Hashes all of the passwords in the database
+router.put('/',  (req, res, next) => {
+    //Fetching all users from the database
+    User.find({} ,function(error, users){
+        if(error){
+            return next(error);
+        } else {
+            console.log(users);
+            users.forEach(function(user){
+                user.set({
+                    password: 'password'
+                })
+                user.save(function(error, updatedUser){
+                    if(error){
+                        return next(error);
+                    }
+                    console.log('Successfully updated user!');
+                })
+            })
+            res.send('All passwords hashed in database!');
+        }
+    })
+})
+
+// router.put('/:courseId', mid.headerAuthentication, (req, res, next) => {
+//     const courseId = req.params.courseId;
+//     console.log(courseId);
+//     //Based on the query parameters courseId, retrieve the specific course
+//     Course.findById(courseId)
+//         .exec(function(error, course){
+//             console.log(course); 
+//             if(error || !course){
+//                 //If there was an error, send it back to the user
+//                 error.status = 404;
+//                 return next(error);
+//             } else {
+//                 //After retrieving the course, set its data to the request body
+//                 course.set(req.body);
+//                 console.log(course);
+//                 //ERROR WITH UPDATING THE COURSE ID - ASKED ON SLACK
+//                 course.save(function(error, updatedCourse){
+//                     if(error){
+//                             return next(error);
+//                     }
+//                 })
+//             }
+//         })
+// })
+
 
 
 module.exports = router;
