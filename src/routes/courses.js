@@ -33,10 +33,11 @@ router.post('/', mid.headerAuthentication, (req, res, next) => {
         }, function(error, course){
             //If there is an error handle it
             if(error){
+                error.status = 400
                 return next(error);
             }
-            //Redirect to the course details page for the newly created course
-            res.redirect(`/api/courses/${course._id}`)
+            //Reset the location header, and return no content
+            res.redirect(`/`, 201);
         })
     } else {
         const error = new Error('Title and description are required');
@@ -69,7 +70,7 @@ router.get('/:courseId', (req, res, next) => {
                    err.status = 404;
                    return next(err);
               }
-              return res.json(course);
+              return res.status(200).json(course);
           })
 })
 
@@ -84,7 +85,7 @@ router.get('/', (req, res, next) => {
             return next(error);
         } else {
             //If not return the course results as json
-            return res.json(courses);
+            return res.status(200).json(courses);
         }
     })
 })
@@ -97,48 +98,56 @@ router.put('/:courseId', mid.headerAuthentication, (req, res, next) => {
     //Based on the query parameters courseId, retrieve the specific course
     Course.findById(courseId)
         .exec(function(error, course){
-            console.log(course); 
-            if(error || !course){
-                //If there was an error, send it back to the user
+            //If the course is null/undefined, the submitted id is wrong
+            if(!course){
+                let err = new Error('Course with submitted id does not exist in db')
+                err.status = 400;
+                return next(err);
+            }
+            //If there was an error, send it back to the user
+            if(error){
                 error.status = 404;
                 return next(error);
             } else {
                 //After retrieving the course, set its data to the request body
                 course.set(req.body);
-                console.log(course);
-                //ERROR WITH UPDATING THE COURSE ID - ASKED ON SLACK
                 course.save(function(error, updatedCourse){
                     if(error){
+                            error.status = 400;
                             return next(error);
                     }
+                    //204 indicates that the request has succeeded, but that the client doesn't need to go away from its current page
+                    return res.status(204).send()
                 })
             }
         })
 })
-
+// POST /api/courses/:courseId/reviews
+// Creates a review for the specified course
 router.post('/:courseId/reviews', mid.headerAuthentication, (req, res, next) => {
     const courseId = req.params.courseId;
     //Based on the query parameters courseId, retrieve the specific course
     Course.findById(courseId)
         .exec(function(error, course){
-            if(error || !course){
-                //If there was an error, send it back to the user
+            //If the course is null/undefined, the submitted id is wrong
+            if(!course){
+                let err = new Error('Course with submitted id does not exist in db')
+                err.status = 400;
+                return next(err);
+            }
+            //If there was an error, send it back to the user
+            if(error){
                 error.status = 404;
                 return next(error);
             } else {
                 //Validation that user cannot review his own course
+                console.log(course.user._id);
+                console.log(req.session.userId);
                 if(course.user._id.equals(req.session.userId)){
                     let err = new Error('User who created this course cannot review it');
                     err.status = 400;
                     return next(err);
                 }
-                //A user must be logged in in order to submit a review
-                // if(!req.session.userId){
-                //     let error = new Error('A user must be logged in, in order to submit a review')
-                //     //403 means unauthorized
-                //     error.status = 403;
-                //     return next(error);
-                // }
                 //The review must firstly be saved to the db
                 Review.create({
                     user: req.session.userId,
@@ -159,7 +168,7 @@ router.post('/:courseId/reviews', mid.headerAuthentication, (req, res, next) => 
                             return next(error);
                         }
                         //Redirecting to the course detail page
-                        res.redirect(`/api/courses/${updatedCourse._id}`);
+                        res.redirect(`/api/courses/${updatedCourse._id}`, 201);
                     })
                 })
             }

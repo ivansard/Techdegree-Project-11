@@ -38,18 +38,19 @@ router.post('/', (req, res, next) => {
         }, function(error, user){
             //If there was an error, handle it
             if(error){
+                error.status = 400;
                 return next(error);
             }
             //If a user was returned, set his id in the session, and redirect to the get route
-            req.session.userId = user._id;
-            res.redirect('/');
+            // req.session.userId = user._id;
+            res.redirect(201, '/');
 
         })
     } else {
       //If either email or password is missing we create a 401 error
       //which represents 'Unauthorized' - missing or bad authentication
       let error = new Error('Email, password, and full name are all mandatory')
-      error.status = 401 
+      error.status = 400 
       return next(error); 
     }
 })
@@ -118,31 +119,6 @@ router.put('/',  (req, res, next) => {
         }
     })
 })
-
-// router.put('/:courseId', mid.headerAuthentication, (req, res, next) => {
-//     const courseId = req.params.courseId;
-//     console.log(courseId);
-//     //Based on the query parameters courseId, retrieve the specific course
-//     Course.findById(courseId)
-//         .exec(function(error, course){
-//             console.log(course); 
-//             if(error || !course){
-//                 //If there was an error, send it back to the user
-//                 error.status = 404;
-//                 return next(error);
-//             } else {
-//                 //After retrieving the course, set its data to the request body
-//                 course.set(req.body);
-//                 console.log(course);
-//                 //ERROR WITH UPDATING THE COURSE ID - ASKED ON SLACK
-//                 course.save(function(error, updatedCourse){
-//                     if(error){
-//                             return next(error);
-//                     }
-//                 })
-//             }
-//         })
-// })
 
 
 

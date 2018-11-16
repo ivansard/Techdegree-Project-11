@@ -3,8 +3,7 @@ const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
-//User schema and model
-
+//USER SCHEMA AND MODEL
 function validateEmail(email){
    const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
    return emailRegex.test(email);
@@ -37,7 +36,7 @@ UserSchema.statics.authenticate = function(email, password, callback){
     //Find the document with the matching email
     User.findOne({emailAddress: email})
         .exec(function(error, user){
-            if(error){
+            if(error || !user){
                 let err = new Error('A user with the submitted email does not exist');
                 err.status = 401;
                 return callback(error);
@@ -61,11 +60,7 @@ UserSchema.statics.authenticate = function(email, password, callback){
 
 const User = mongoose.model('User', UserSchema);
 
-
-
-
-//Review schema and model
-
+//REVIEW SCHEMA AND MODEL
 function validateRating(rating){
     if(rating >= 1 && rating <=5){
         return true;
@@ -84,8 +79,7 @@ const ReviewSchema = new Schema({
 
 const Review = mongoose.model('Review', ReviewSchema);
 
-//Course schema and model
-
+//COURSE SCHEMA AND MODEL
 const CourseSchema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'User'},
     title: {type: String, required: true},
